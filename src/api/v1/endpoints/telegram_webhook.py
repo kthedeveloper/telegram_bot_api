@@ -4,7 +4,7 @@ import os
 
 router = APIRouter()
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 SECRET_TOKEN = os.getenv("TELEGRAM_SECRET_TOKEN")
 
 @router.post("/")
@@ -22,9 +22,11 @@ async def telegram_webhook(
 
     if chat_id and message:
         async with httpx.AsyncClient() as client:
-            await client.post(
+            response = await client.post(
                 f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                json={"chat_id": chat_id, "text": f" Ваше сообщение: {message}"},
+                json={"chat_id": chat_id, "text": f"Ваше сообщение: {message}"},
             )
+            print(response.status_code, response.text)
+            response.raise_for_status()
 
     return {"ok": True}
