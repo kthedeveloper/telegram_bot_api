@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -12,9 +13,9 @@ from api.v1.endpoints.telegram_webhook import router as telegram_router
 from core.utils.webhook import set_webhook
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
     # Do startup action
-    await set_webhook()
+    asyncio.create_task(set_webhook())
     yield
 
 def create_app() -> FastAPI:
@@ -29,7 +30,7 @@ def create_app() -> FastAPI:
 
     app.include_router(items_router, prefix=f"{settings.API_PREFIX}/items")
     app.include_router(products_router, prefix=f"{settings.API_PREFIX}/products")
-    app.include_router(telegram_router, prefix="/webhook")
+    app.include_router(telegram_router, prefix=f"{settings.API_PREFIX}/webhook")
     return app
 
 
