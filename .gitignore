@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# dotenv
+.env
+
+# VSCode / PyCharm
+.idea/
+.vscode/
+
+# Docker
+*.log
+__docker_build__/
+
+# OS
+.DS_Store
+Thumbs.db
