@@ -8,6 +8,9 @@ class Settings(BaseSettings):
 
     BIND_HOST: str
     BIND_PORT: int = Field(8080, env="BIND_PORT")
+    TELEGRAM_BOT_TOKEN: str = Field(..., env="TELEGRAM_BOT_TOKEN")
+    TELEGRAM_SECRET_TOKEN: str = Field(..., env="TELEGRAM_SECRET_TOKEN")
+    WEBHOOK_URL: str = Field(..., env="WEBHOOK_URL")
 
     class Config:
         env_file = ".env"

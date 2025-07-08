@@ -1,18 +1,17 @@
 from fastapi import APIRouter, Request, Header, HTTPException
 import httpx
-import os
+
+from core.config import settings
 
 router = APIRouter()
 
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-SECRET_TOKEN = os.getenv("TELEGRAM_SECRET_TOKEN")
 
 @router.post("/")
 async def telegram_webhook(
         request: Request,
         x_telegram_bot_api_secret_token: str = Header(None),
 ):
-    if x_telegram_bot_api_secret_token != SECRET_TOKEN:
+    if x_telegram_bot_api_secret_token != settings.SECRET_TOKEN:
         raise HTTPException(status_code=403, detail="Token mismatch")
 
     body = await request.json()
@@ -23,7 +22,7 @@ async def telegram_webhook(
     if chat_id and message:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage",
                 json={"chat_id": chat_id, "text": f"Ваше сообщение: {message}"},
             )
             print(response.status_code, response.text)
