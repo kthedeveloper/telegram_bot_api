@@ -2,22 +2,21 @@ from fastapi import APIRouter, Request, Header, HTTPException
 import httpx
 
 from core.config import settings
+from schemas import telegram
 
 router = APIRouter()
 
 
 @router.post("/")
 async def telegram_webhook(
-        request: Request,
+        telegram_update: telegram.TelegramUpdate,
         x_telegram_bot_api_secret_token: str = Header(None),
 ):
     if x_telegram_bot_api_secret_token != settings.TELEGRAM_SECRET_TOKEN:
         raise HTTPException(status_code=403, detail="Token mismatch")
 
-    body = await request.json()
-
-    message = body.get("message", {}).get("text")
-    chat_id = body.get("message", {}).get("chat", {}).get("id")
+    message = telegram_update.message.text
+    chat_id = telegram_update.message.chat.id
 
     if chat_id and message:
         async with httpx.AsyncClient() as client:
