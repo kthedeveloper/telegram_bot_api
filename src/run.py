@@ -12,11 +12,15 @@ from api.v1.endpoints.telegram_webhook import router as telegram_router
 
 from core.utils.webhook import set_webhook
 
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     # Do startup action
-    asyncio.create_task(set_webhook())
+    if settings.UPDATE_WEBHOOK:
+        _ = asyncio.create_task(set_webhook())
+
     yield
+
 
 def create_app() -> FastAPI:
     app = FastAPI(

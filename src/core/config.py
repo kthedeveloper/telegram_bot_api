@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str = Field('', env="TELEGRAM_BOT_TOKEN")
     TELEGRAM_SECRET_TOKEN: str = Field('', env="TELEGRAM_SECRET_TOKEN")
     WEBHOOK_URL: str = Field('', env="WEBHOOK_URL")
+    POSTGRES_DSN: str = Field('', env="POSTGRES_DSN")
+    UPDATE_WEBHOOK: bool = Field(False, env="UPDATE_WEBHOOK")
 
     class Config:
         env_file = ".env"
