@@ -11,7 +11,7 @@ class UserRepository:
             statement = select(User).filter(User.chat_id == chat_id)  # noqa
             result = await session.execute(statement)
 
-            user_exists = await result.one_or_none() is not None
+            user_exists = result.one_or_none() is not None
 
         if not user_exists:
             async with async_session() as session:  # type: AsyncSession
