@@ -7,3 +7,6 @@ pytest
 pytest-asyncio
 SQLAlchemy
 asyncpg
+alembic
+psycopg2
+psycopg2-binary

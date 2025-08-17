@@ -11,9 +11,11 @@ async def process_request(update: TelegramUpdate):
             update.message.chat.username, update.message.chat.id
         )
 
+    # TODO: create task entry (in database)
     if getattr(update.message, 'voice', None):
         await handle_voice(update)
     elif getattr(update.message, 'video', None):
         await handle_video(update)
     elif getattr(update.message, 'video_note', None):
         await handle_video_note(update)
+    # TODO: mark task complete
