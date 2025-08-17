@@ -19,6 +19,8 @@ async def lifespan(_: FastAPI):
     if settings.UPDATE_WEBHOOK:
         _ = asyncio.create_task(set_webhook())
 
+    # TODO: check uncompleted tasks
+
     yield
 
 
