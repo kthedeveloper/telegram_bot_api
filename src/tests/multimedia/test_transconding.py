@@ -1,5 +1,5 @@
 import os
-from service.worker import transcode_audio
+from service.transcode import transcode_audio
 
 
 def test_transconding():
