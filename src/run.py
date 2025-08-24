@@ -11,6 +11,7 @@ from api.v1.endpoints.products import router as products_router
 from api.v1.endpoints.telegram_webhook import router as telegram_router
 
 from core.utils.webhook import set_webhook
+from db.repo.task_repo import TaskRepository
 
 
 @asynccontextmanager
@@ -20,6 +21,9 @@ async def lifespan(_: FastAPI):
         _ = asyncio.create_task(set_webhook())
 
     # TODO: check uncompleted tasks
+    unfinished = await TaskRepository.list_unfinished(("queued",))
+    for t in unfinished:
+        await TaskRepository.set_status(t.id, "queued")
 
     yield
 
