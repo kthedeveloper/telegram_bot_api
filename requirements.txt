@@ -10,3 +10,4 @@ asyncpg
 alembic
 psycopg2
 psycopg2-binary
+testcontainers
