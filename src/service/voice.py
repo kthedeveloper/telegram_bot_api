@@ -42,3 +42,4 @@ async def handle_voice(telegram_update: TelegramUpdate):
             executor_process, transcode_audio, file_save_path, file_save_path_wav
         )
 
+        return file_save_path_wav
