@@ -1,4 +1,6 @@
 import asyncio
+import os
+
 import httpx
 import multiprocessing
 import uvicorn
@@ -9,24 +11,27 @@ from testcontainers.postgres import PostgresContainer
 from tests.repo.test_user_repo import postgres_container
 
 
+def run_app(_url):
+    from core.config import settings
+    settings.POSTGRES_DSN = _url
+    uvicorn.run('run:create_app', host="0.0.0.0", port=9999)
+
 # @pytest.mark.asyncio
 @pytest_asyncio.fixture
 async def app(postgres_container: PostgresContainer):
-    from run import create_app
+    url = postgres_container.get_connection_url(driver='asyncpg')
 
-    app = create_app()
     p = multiprocessing.Process(
-        target=lambda: uvicorn.run(app, host="0.0.0.0", port=9999),
-        daemon=True
+        target=run_app,
+        daemon=True,
+        args=(url,),
     )
     p.start()
-
-    return p
 
 
 @pytest.mark.asyncio
 async def test_get_items(app):
-    await asyncio.sleep(5)
+    await asyncio.sleep(10)
     async with httpx.AsyncClient() as client:
         r = await client.get("http://127.0.0.1:9999/api/v1/items/")
 
@@ -40,7 +45,7 @@ async def test_get_items(app):
 
 @pytest.mark.asyncio
 async def test_get_single_item(app):
-    await asyncio.sleep(3)
+    await asyncio.sleep(10)
     async with httpx.AsyncClient() as client:
         r = await client.get("http://127.0.0.1:9999/api/v1/items/1")
 
@@ -50,7 +55,7 @@ async def test_get_single_item(app):
 
 @pytest.mark.asyncio
 async def test_delete_item(app):
-    await asyncio.sleep(3)
+    await asyncio.sleep(10)
     async with httpx.AsyncClient() as client:
         r = await client.delete("http://127.0.0.1:9999/api/v1/items/4")
         assert r.status_code == 200
