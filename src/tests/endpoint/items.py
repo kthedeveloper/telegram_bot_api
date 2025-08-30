@@ -1,3 +1,4 @@
+import os
 import asyncio
 import httpx
 import multiprocessing
@@ -7,17 +8,25 @@ import pytest_asyncio
 from testcontainers.postgres import PostgresContainer
 
 from tests.repo.test_user_repo import postgres_container
+import multiprocessing
 
+
+mp_event = multiprocessing.Event()
 
 # @pytest.mark.asyncio
 @pytest_asyncio.fixture
 async def app(postgres_container: PostgresContainer):
-    from run import create_app
+    url = postgres_container.get_connection_url(driver='asyncpg')
 
-    app = create_app()
+    def run_app(_url):
+        os.environ['POSTGRES_DSN'] = _url
+        mp_event.set()
+        uvicorn.run('run:create_app', host="0.0.0.0", port=9999)
+
     p = multiprocessing.Process(
-        target=lambda: uvicorn.run(app, host="0.0.0.0", port=9999),
-        daemon=True
+        target=run_app,
+        daemon=True,
+        args=(url,),
     )
     p.start()
 
@@ -26,7 +35,7 @@ async def app(postgres_container: PostgresContainer):
 
 @pytest.mark.asyncio
 async def test_get_items(app):
-    await asyncio.sleep(5)
+    mp_event.wait()
     async with httpx.AsyncClient() as client:
         r = await client.get("http://127.0.0.1:9999/api/v1/items/")
 
