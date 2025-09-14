@@ -1,9 +1,10 @@
 import asyncio
 from db.models.user import Base
-from db.session import engine
+from db.session import db_engine
 
 
 async def init_models():
+    engine = db_engine.get_engine()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
