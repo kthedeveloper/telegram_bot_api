@@ -6,7 +6,7 @@ from .voice import handle_voice
 from .video import handle_video
 from .video_note import handle_video_note
 from service.user_service import handle_start
-from service.recognize import recognize
+from service.asr.recognizer_factory import create_recognizer
 
 
 async def process_request(update: TelegramUpdate):
@@ -19,7 +19,10 @@ async def process_request(update: TelegramUpdate):
     if getattr(update.message, 'voice', None):
         wav_path = await handle_voice(update)
         # TODO: put kaldi url to the config
-        recognized = await recognize(wav_path, "ws://127.0.0.1:2700")
+
+        recognizer = create_recognizer("vosk", wav_path, "ws://127.0.0.1:2700")
+        recognized = await recognizer.recognize()
+
         await send_message_tg(recognized, update.message.chat.id)
 
     elif getattr(update.message, 'video', None):
