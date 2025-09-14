@@ -1,5 +1,7 @@
 import os
 import asyncio
+import os
+
 import httpx
 import uvicorn
 import pytest
@@ -9,6 +11,11 @@ from testcontainers.postgres import PostgresContainer
 from tests.repo.test_user_repo import postgres_container
 import multiprocessing
 
+
+def run_app(_url):
+    from core.config import settings
+    settings.POSTGRES_DSN = _url
+    uvicorn.run('run:create_app', host="0.0.0.0", port=9999)
 
 # @pytest.mark.asyncio
 @pytest_asyncio.fixture
@@ -56,7 +63,7 @@ async def test_get_items(app):
 
 @pytest.mark.asyncio
 async def test_get_single_item(app):
-    await asyncio.sleep(3)
+    await asyncio.sleep(10)
     async with httpx.AsyncClient() as client:
         r = await client.get("http://127.0.0.1:9999/api/v1/items/1")
 
@@ -66,7 +73,7 @@ async def test_get_single_item(app):
 
 @pytest.mark.asyncio
 async def test_delete_item(app):
-    await asyncio.sleep(3)
+    await asyncio.sleep(10)
     async with httpx.AsyncClient() as client:
         r = await client.delete("http://127.0.0.1:9999/api/v1/items/4")
         assert r.status_code == 200
