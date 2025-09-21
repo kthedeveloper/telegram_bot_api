@@ -1,6 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
-import threading
+import aiomonitor
 
 import uvicorn
 from fastapi import FastAPI
@@ -14,6 +14,7 @@ from api.v1.endpoints.telegram_webhook import router as telegram_router
 from core.utils.webhook import set_webhook
 
 
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     # Do startup action
@@ -21,8 +22,8 @@ async def lifespan(_: FastAPI):
         _ = asyncio.create_task(set_webhook())
 
     # TODO: check uncompleted tasks
-
-    yield
+    with aiomonitor.start_monitor(loop=asyncio.get_running_loop()):
+        yield
 
 
 def create_app() -> FastAPI:

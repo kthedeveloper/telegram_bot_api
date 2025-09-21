@@ -1,12 +1,15 @@
+import asyncio
+
 import httpx
 
 from core.config import settings
 from schemas.telegram import TelegramUpdate
-from .voice import handle_voice
-from .video import handle_video
-from .video_note import handle_video_note
+# from .voice import handle_voice
+# from .video import handle_video
+# from .video_note import handle_video_note
 from service.user_service import handle_start
-from service.asr.recognizer_factory import create_recognizer
+# from service.asr.recognizer_factory import create_recognizer
+from service.rpc.client import RpcClient
 
 
 async def process_request(update: TelegramUpdate):
@@ -15,20 +18,17 @@ async def process_request(update: TelegramUpdate):
             update.message.chat.username, update.message.chat.id
         )
 
+    rpc_client = RpcClient(asyncio.get_running_loop())
+
     # TODO: create task entry (in database)
     if getattr(update.message, 'voice', None):
-        wav_path = await handle_voice(update)
-        # TODO: put kaldi url to the config
-
-        recognizer = create_recognizer("vosk", wav_path, "ws://127.0.0.1:2700")
-        recognized = await recognizer.recognize()
-
-        await send_message_tg(recognized, update.message.chat.id)
+        await rpc_client.call("handle_voice_request", update)
 
     elif getattr(update.message, 'video', None):
-        await handle_video(update)
+        await rpc_client.call("handle_video_request", update)
+
     elif getattr(update.message, 'video_note', None):
-        await handle_video_note(update)
+        await rpc_client.call("handle_video_note_request", update)
     # TODO: mark task complete
 
 
