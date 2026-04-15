@@ -24,6 +24,7 @@ Backend service for a Telegram bot that receives voice messages, processes audio
 
 ---
 
+```text
 Telegram → Webhook → FastAPI → Background Task
                          ↓
                   Audio Processing
@@ -31,3 +32,4 @@ Telegram → Webhook → FastAPI → Background Task
                     ASR Engine
                          ↓
                   Response to User
+```
